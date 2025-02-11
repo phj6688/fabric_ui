@@ -21,9 +21,14 @@ RUN apt-get update && \
 RUN curl -L https://github.com/danielmiessler/fabric/releases/latest/download/fabric-linux-arm64 > /usr/local/bin/fabric && \
     chmod +x /usr/local/bin/fabric
 
+# Create data directory
+RUN mkdir -p /app/data
+
 # Copy application files
 COPY ui.py .
 COPY fabric_api.py .
+COPY db_handler.py .
+COPY init_db.py .
 
 # Install streamlit-option-menu
 RUN pip install --no-cache-dir streamlit-option-menu
@@ -39,6 +44,12 @@ RUN chmod +x start.sh
 ENV STREAMLIT_SERVER_PORT=8700
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 ENV PATH="/usr/local/bin:${PATH}"
+
+# Create Volume
+VOLUME /app/data
+
+# Initialize the database
+RUN python init_db.py
 
 # Run both services using the startup script
 CMD ["./start.sh"]

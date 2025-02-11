@@ -4,9 +4,15 @@ from sqlalchemy.orm import sessionmaker, relationship
 import datetime
 import bcrypt
 import datetime
+import os
 
-# Database Setup
-DATABASE_URL = "sqlite:///fabric-ui.db"
+
+# Database Setup - Using volume path
+DATABASE_PATH = "/app/data/fabric-ui.db"
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+
+os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

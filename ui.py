@@ -33,8 +33,6 @@ def init_session_state():
         st.session_state.authenticated = False
     if "username" not in st.session_state:
         st.session_state.username = None
-    if "show_login" not in st.session_state:
-        st.session_state.show_login = False
 
 def switch_to_login():
     st.session_state.show_login = True
@@ -43,51 +41,15 @@ def switch_to_login():
 def show_auth_page():
     st.title("Fabric UI - Authentication")
     
-    # After successful registration, only show login tab
-    if st.session_state.show_login:
-        st.header("Login")
-        username = st.text_input("Username", key="login_username")
-        password = st.text_input("Password", type="password", key="login_password")
-        
-        col1, col2 = st.columns([1, 4])
-        with col1:
-            if st.button("Login", use_container_width=True):
-                handle_login(username, password)
-    else:
-        # Centered tabs for Login/Register
-        tab1, tab2 = st.tabs(["Login", "Register"])
-        
-        with tab1:
-            st.header("Login")
-            username = st.text_input("Username", key="login_username")
-            password = st.text_input("Password", type="password", key="login_password")
-            
-            col1, col2 = st.columns([1, 4])
-            with col1:
-                if st.button("Login", use_container_width=True):
-                    handle_login(username, password)
-        
-        with tab2:
-            st.header("Register")
-            new_username = st.text_input("Username", key="register_username")
-            new_password = st.text_input("Password", type="password", key="register_password")
-            confirm_password = st.text_input("Confirm Password", type="password")
-            
-            col1, col2 = st.columns([1, 4])
-            with col1:
-                if st.button("Register", use_container_width=True):
-                    if new_password != confirm_password:
-                        st.error("Passwords do not match!")
-                    elif not new_username or not new_password:
-                        st.error("Please fill in all fields!")
-                    else:
-                        response = db_handler.create_user(new_username, new_password)
-                        if response == "User created successfully":
-                            st.success(response)
-                            time.sleep(2)
-                            switch_to_login()  
-                        else:
-                            st.error(response)
+    st.header("Login")
+    username = st.text_input("Username", key="login_username")
+    password = st.text_input("Password", type="password", key="login_password")
+    
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        if st.button("Login", use_container_width=True):
+            handle_login(username, password)
+
 
 def show_main_app():
     st.title("Fabric UI")
@@ -160,7 +122,7 @@ def show_main_app():
 
     if st.button("Submit"):
         try:
-            response = requests.post("http://127.0.0.1:8700/execute/", json={"command": cmd})
+            response = requests.post("http://127.0.0.1:7070/execute/", json={"command": cmd})
             if response.status_code == 200:
                 result = response.json()
                 st.markdown("**_Output:_**")
