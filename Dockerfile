@@ -4,22 +4,33 @@ FROM python:3.9-slim
 # Set working directory
 WORKDIR /app
 
-# Copy requirements files
-COPY requirements.txt .
-
-# Install system dependencies and Python packages
+# Install system dependencies, Python packages, and Go
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
     git \
     curl \
     procps \
+    wget \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir -r requirements.txt
 
-# Download and install Fabric for ARM64
-RUN curl -L https://github.com/danielmiessler/fabric/releases/latest/download/fabric-linux-arm64 > /usr/local/bin/fabric && \
-    chmod +x /usr/local/bin/fabric
+# Install Go (ARM64 version for Linux)
+RUN curl -L https://go.dev/dl/go1.21.5.linux-arm64.tar.gz | tar -C /usr/local -xz
+
+# Set up Go environment variables
+ENV GOROOT=/usr/local/go
+ENV GOPATH=/go
+ENV PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
+
+# Verify Go installation
+RUN go version
+
+# Install Fabric using Go
+RUN go install github.com/danielmiessler/fabric@latest
+
+# Ensure Fabric is accessible globally
+RUN ln -s /go/bin/fabric /usr/local/bin/fabric
 
 # Create data directory
 RUN mkdir -p /app/data
