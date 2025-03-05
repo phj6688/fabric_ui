@@ -4,6 +4,8 @@ FROM python:3.9-slim
 # Set working directory
 WORKDIR /app
 
+COPY requirements.txt /app/requirements.txt
+
 # Install system dependencies, Python packages, and Go
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
