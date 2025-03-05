@@ -44,6 +44,7 @@ RUN chmod +x start.sh
 ENV STREAMLIT_SERVER_PORT=8700
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 ENV PATH="/usr/local/bin:${PATH}"
+ENV APP_TITLE="ContentMaster AI"
 
 # Create Volume
 VOLUME /app/data

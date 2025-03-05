@@ -39,7 +39,7 @@ def switch_to_login():
     st.rerun()
 
 def show_auth_page():
-    st.title("Fabric UI - Authentication")
+    st.title("ContentMaster AI - Authentication")
     
     st.header("Login")
     username = st.text_input("Username", key="login_username")
@@ -52,7 +52,7 @@ def show_auth_page():
 
 
 def show_main_app():
-    st.title("Fabric UI")
+    st.title("ContentMaster AI")
     
     # Add logout button in the top right
     col1, col2 = st.columns([6, 1])
@@ -64,14 +64,14 @@ def show_main_app():
 
     # Dictionary containing explanations for each pattern
     pattern_explanations = {
-        "summarize": "Generates a concise overview of the content.",
-        "summarize_micro": "Produces an ultra-short summary highlighting only the essentials.",
-        "extract_wisdom": "Pulls out key insights, quotes, and actionable takeaways.",
-        "extract_main_idea": "Isolates the central theme or message of the content.",
-        "extract_instructions": "Identifies and lists actionable steps or guidelines mentioned.",
-        "improve_prompt": "Refines a prompt to enhance clarity and effectiveness.",
-        "improve_writing": "Edits the text for better style, coherence, and readability.",
-        "other": "Allows you to define a custom query or task."
+        "executive_summary": "Generates a concise, professional overview of the content.",
+        "key_points": "Produces an ultra-short summary highlighting only the essential takeaways.",
+        "insight_extraction": "Identifies valuable insights, quotes, and actionable intelligence.",
+        "core_concept": "Isolates the central theme or primary message of the content.",
+        "action_steps": "Identifies and lists actionable steps or guidelines mentioned.",
+        "prompt_enhancement": "Refines a prompt to enhance clarity and effectiveness.",
+        "content_polish": "Edits the text for better style, coherence, and professional tone.",
+        "custom_analysis": "Allows you to define a custom query or analytical task."
     }
 
     # Language selection
@@ -96,29 +96,49 @@ def show_main_app():
     if func_selected == "YouTube":
         pattern = st.selectbox(
             "Select a pattern for YouTube",
-            options=["summarize", "summarize_micro", "extract_wisdom", "extract_main_idea", "extract_instructions", "other"],
+            options=["executive_summary", "key_points", "insight_extraction", "core_concept", "action_steps", "custom_analysis"],
             format_func=lambda x: f"{x} - {pattern_explanations.get(x, '')}"
         )
         url = st.text_input("Enter the URL:")
         quoted_url = shlex.quote(url)
-        if pattern == "other":
+        if pattern == "custom_analysis":
             custom_query = st.text_input("Enter your question:")
             cmd = f"fabric -y {quoted_url} {custom_query} -g {language}"
         else:
-            cmd = f"fabric -y {quoted_url} -p {pattern} -g {language}"
+            # Map the new pattern names to the original ones expected by the backend
+            pattern_mapping = {
+                "executive_summary": "summarize",
+                "key_points": "summarize_micro",
+                "insight_extraction": "extract_wisdom",
+                "core_concept": "extract_main_idea",
+                "action_steps": "extract_instructions",
+                "custom_analysis": "other"
+            }
+            cmd = f"fabric -y {quoted_url} -p {pattern_mapping[pattern]} -g {language}"
     else:
         pattern = st.selectbox(
             "Select a pattern for Text",
-            options=["summarize", "summarize_micro", "extract_wisdom", "extract_main_idea", "improve_prompt", "improve_writing", "extract_instructions", "other"],
+            options=["executive_summary", "key_points", "insight_extraction", "core_concept", "prompt_enhancement", "content_polish", "action_steps", "custom_analysis"],
             format_func=lambda x: f"{x} - {pattern_explanations.get(x, '')}"
         )
         text = st.text_area("Enter text here", height=200)
         quoted_text = shlex.quote(text)
-        if pattern == "other":
+        if pattern == "custom_analysis":
             custom_query = st.text_input("Enter your question:")
             cmd = f'echo {quoted_text} | fabric -p "{custom_query} -g {language}"'
         else:
-            cmd = f'echo {quoted_text} | fabric -p {pattern} -g {language}'
+            # Map the new pattern names to the original ones expected by the backend
+            pattern_mapping = {
+                "executive_summary": "summarize",
+                "key_points": "summarize_micro",
+                "insight_extraction": "extract_wisdom",
+                "core_concept": "extract_main_idea",
+                "action_steps": "extract_instructions",
+                "prompt_enhancement": "improve_prompt",
+                "content_polish": "improve_writing",
+                "custom_analysis": "other"
+            }
+            cmd = f'echo {quoted_text} | fabric -p {pattern_mapping[pattern]} -g {language}'
 
     if st.button("Submit"):
         try:
@@ -137,8 +157,8 @@ def show_main_app():
 
 def main():
     st.set_page_config(
-        page_title="Fabric UI",
-        page_icon=":thread:",
+        page_title="ContentMaster AI",
+        page_icon="📊",
         layout="centered",
         initial_sidebar_state="collapsed"
     )
