@@ -1,22 +1,42 @@
-from db_handler import create_user, engine, Base
+from flask import Flask
+from db_handler import db, create_user
+import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def init_db():
-    Base.metadata.create_all(bind=engine)
+    """Initialize the database with default users."""
+    # Create a temporary Flask app for the database context
+    app = Flask(__name__)
     
-    # Create predefined users
-    users = [
-        {"username": "admin", "password": "IamAdmin2411"},
-        {"username": "Arezou", "password": "123Arezou456"},
-        {"username": "Jalal", "password": "147Jalal369"},        
-    ]
+    # Configure the app for database initialization
+    DATABASE_DIR = '/app/data'
+    os.makedirs(DATABASE_DIR, exist_ok=True)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(DATABASE_DIR, 'fabric-ui.db')}"
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
-    for user in users:
-        response = create_user(user["username"], user["password"])
-        print(f"Creating user {user['username']}: {response}")
+    # Initialize the database
+    db.init_app(app)
+    
+    with app.app_context():
+        # Create all tables
+        db.create_all()
+        
+        # Create predefined users
+        users = [
+            {"username": "admin", "password": "IamAdmin2411"},
+            {"username": "Arezou", "password": "123Arezou456"},
+            {"username": "Jalal", "password": "147Jalal369"},        
+        ]
+        
+        for user in users:
+            response = create_user(user["username"], user["password"])
+            logger.info(f"Creating user {user['username']}: {response}")
 
 if __name__ == "__main__":
-    print("Initializing database...")
+    logger.info("Initializing database...")
     init_db()
-    print("Database initialization complete!")
+    logger.info("Database initialization complete!")
 
-    

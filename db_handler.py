@@ -1,24 +1,15 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 import datetime
 import bcrypt
-import datetime
 import os
 
-
-# Database Setup - Using volume path
-DATABASE_PATH = "/app/data/fabric-ui.db"
-DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
-
-os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
-
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+# Initialize SQLAlchemy
+db = SQLAlchemy()
 
 # User Model
-class User(Base):
+class User(db.Model):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False)
@@ -35,7 +26,7 @@ class User(Base):
 
 
 # Action Model
-class Action(Base):
+class Action(db.Model):
     __tablename__ = "actions"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
@@ -44,55 +35,52 @@ class Action(Base):
     user = relationship("User", back_populates="actions")
 
 
-Base.metadata.create_all(bind=engine)
-
-
 # Database Helper Functions
 def get_user(username: str):
-    session = SessionLocal()
-    user = session.query(User).filter(User.username == username).first()
-    session.close()
-    return user
+    """Get a user by username"""
+    return User.query.filter_by(username=username).first()
+
 
 def create_user(username: str, password: str):
-    session = SessionLocal()
+    """Create a new user"""
     if get_user(username):
         return "User already exists"
+    
     new_user = User(username=username, password_hash=User.hash_password(password))
-    session.add(new_user)
-    session.commit()
-    session.close()
+    db.session.add(new_user)
+    db.session.commit()
     return "User created successfully"
 
 
 def update_password(username: str, new_password: str):
-    session = SessionLocal()
-    user = session.query(User).filter(User.username == username).first()
+    """Update a user's password"""
+    user = User.query.filter_by(username=username).first()
     if not user:
         return "User not found"
+    
     user.password_hash = User.hash_password(new_password)
-    session.commit()
-    session.close()
+    db.session.commit()
     return "Password updated successfully"
 
 
 def log_action(username: str, action: str):
-    session = SessionLocal()
+    """Log a user action"""
     user = get_user(username)
     if not user:
         return "User not found"
+    
     new_action = Action(user_id=user.id, action=action)
-    session.add(new_action)
-    session.commit()
-    session.close()
+    db.session.add(new_action)
+    db.session.commit()
     return "Action logged"
 
+
 def list_user_actions(username: str):
-    session = SessionLocal()
+    """List all actions for a user"""
     user = get_user(username)
     if not user:
         return "User not found"
-    actions = session.query(Action).filter(Action.user_id == user.id).all()
-    session.close()
+    
+    actions = Action.query.filter_by(user_id=user.id).all()
     return [{"action": a.action, "timestamp": a.timestamp} for a in actions]
 

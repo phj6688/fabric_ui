@@ -1,132 +1,114 @@
 # ContentMaster AI
 
-A containerized web interface for [danielmiessler/fabric](https://github.com/danielmiessler/fabric) with user authentication and professional content processing.
+ContentMaster AI is a sleek web interface for analyzing content using the Fabric CLI tool. It provides an intuitive way to extract insights, summaries, and other valuable information from both YouTube videos and text content.
 
 ## Features
-- Web-based interface for Fabric CLI with professional content analysis
-- User authentication system
-- Persistent data storage using Docker volumes
-- Support for both YouTube and text analysis
-- Multiple analysis patterns (executive summary, key points, etc.)
-- Language selection (English/German)
-- Interview-ready demonstration showcase
 
-## Prerequisites
-- Docker
-- Git
-- curl (for downloading fabric binary)
+- **Beautiful UI**: Clean, modern interface with an excellent user experience
+- **Content Analysis**: Process YouTube videos and text with various analysis patterns
+- **Multiple Analysis Types**: Executive summaries, key points, insights, action steps, and more
+- **Multi-language Support**: Analyze content in English, German, French, Spanish, and Italian
+- **User Authentication**: Secure login system
+- **Persistent Storage**: User data stored in a Docker volume
+- **Easy Deployment**: Simple Docker setup with docker-compose
 
-## Project Structure
-```
-contentmaster-ai/
-├── Dockerfile
-├── requirements.txt
-├── ui.py
-├── fabric_api.py
-├── db_handler.py
-├── init_db.py
-└── start.sh
-```
+## Screenshot
+
+![ContentMaster AI Screenshot](https://example.com/contentmaster-screenshot.png)
+
+## Simplified Architecture
+
+ContentMaster has been streamlined for simplicity while maintaining all functionality:
+
+- **Single Flask Application**: All processing is handled directly by Flask
+- **No Microservices**: Removed the separate FastAPI component for simpler maintenance
+- **Direct Command Execution**: Fabric CLI commands execute directly within the container
+- **Containerized**: Easy deployment with Docker or docker-compose
 
 ## Quick Start
-1. Clone the repository:
+
+The easiest way to run ContentMaster is with Docker Compose:
+
 ```bash
-git clone <your-repository-url>
-cd contentmaster-ai
+# Clone the repository
+git clone https://github.com/yourusername/contentmaster.git
+cd contentmaster
+
+# Start the application
+docker-compose up -d
+
+# Access the application at http://localhost:8700
 ```
 
-2. Build the Docker image:
-```bash
-docker build -t contentmaster-ai .
+## Default Credentials
+
+The application comes with three default users:
+- Username: `admin`, Password: `IamAdmin2411`
+- Username: `Arezou`, Password: `123Arezou456`
+- Username: `Jalal`, Password: `147Jalal369`
+
+**Important**: For production use, change these default credentials.
+
+## Manual Setup
+
+If you prefer to run without Docker:
+
+1. Install system dependencies:
+   - Python 3.9+
+   - Go (for Fabric CLI)
+
+2. Install Fabric CLI:
+   ```bash
+   go install github.com/danielmiessler/fabric@latest
+   ```
+
+3. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Initialize the database:
+   ```bash
+   python init_db.py
+   ```
+
+5. Run the Flask application:
+   ```bash
+   gunicorn -w 4 -b 0.0.0.0:8700 app:app
+   ```
+
+## Project Structure
+
+```
+contentmaster/
+├── app.py                  # Main Flask application
+├── db_handler.py           # Database models and helper functions
+├── init_db.py              # Database initialization script
+├── requirements.txt        # Python dependencies
+├── Dockerfile              # Docker configuration
+├── docker-compose.yml      # Docker Compose configuration
+├── templates/              # Jinja2 HTML templates
+│   ├── base.html           # Base template with common elements
+│   ├── index.html          # Main application interface
+│   └── login.html          # Login page
+└── static/                 # Static files (CSS, JS, etc.)
 ```
 
-3. Run the container with a persistent volume:
-```bash
-docker run -d \
-  --name contentmaster-ai \
-  -p 8700:8700 \
-  -v contentmaster_db:/app/data \
-  contentmaster-ai
-```
+## Environment Variables
 
-4. Access the application:
-- Open your browser and navigate to `http://localhost:8700`
-- Login with the predefined credentials:
-  - Username: `admin`
-  - Password: `admin_secure_password`
+- `FLASK_ENV`: Set to 'production' for production, 'development' for dev mode
+- `SECRET_KEY`: Secret key for session security (auto-generated if not provided)
 
-## Volume Management
-List all volumes:
-```bash
-docker volume ls
-```
+## Contributing
 
-Backup the database:
-```bash
-docker run --rm -v contentmaster_db:/source -v $(pwd):/backup alpine tar -czvf /backup/contentmaster_db_backup.tar.gz -C /source .
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-Restore from backup:
-```bash
-docker run --rm -v contentmaster_db:/dest -v $(pwd):/backup alpine sh -c "cd /dest && tar -xzvf /backup/contentmaster_db_backup.tar.gz"
-```
+## License
 
-## Troubleshooting
-1. Check container logs:
-```bash
-docker logs contentmaster-ai
-```
+[MIT License](LICENSE)
 
-2. Access container shell:
-```bash
-docker exec -it contentmaster-ai bash
-```
+## Acknowledgments
 
-3. Test Fabric CLI inside container:
-```bash
-fabric --help
-```
-
-4. Test FastAPI endpoint:
-```bash
-curl -X POST http://localhost:7070/execute/ \
-     -H "Content-Type: application/json" \
-     -d '{"command":"fabric --help"}'
-```
-
-## Port Configuration
-The application uses port 8700 for both the web interface and API backend. Make sure this port is available on your host machine.
-
-## Security Notes
-- The registration functionality has been disabled for production use
-- User credentials are stored with bcrypt hashing
-- Database is persisted in a Docker volume
-- Default admin credentials should be changed in production
-
-## Container Management
-Stop the container:
-```bash
-docker stop contentmaster-ai
-```
-
-Remove the container:
-```bash
-docker rm contentmaster-ai
-```
-
-Remove the volume (will delete all data):
-```bash
-docker volume rm contentmaster_db
-```
-
-## Maintenance
-To update the application:
-1. Stop the container
-2. Build a new image
-3. Run a new container (the volume will persist)
-```bash
-docker stop contentmaster-ai
-docker rm contentmaster-ai
-docker build -t contentmaster-ai .
-docker run -d --name contentmaster-ai -p 8700:8700 -v contentmaster_db:/app/data contentmaster-ai
-```
+- [Fabric CLI](https://github.com/danielmiessler/fabric) for content analysis
+- [Flask](https://flask.palletsprojects.com/) web framework
+- [Bootstrap](https://getbootstrap.com/) for the UI components
