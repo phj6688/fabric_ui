@@ -49,6 +49,8 @@ EXPOSE 8700
 ENV PYTHONPATH=/app
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
+ENV APPLICATION_ROOT=/contentmaster
+
 
 # Create Volume for persistent data
 VOLUME /app/data

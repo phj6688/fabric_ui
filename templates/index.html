@@ -237,7 +237,9 @@
                     contentType: false,
                     success: function(response) {
                         if (response.status === 'success') {
-                            $('#result-container').html(response.stdout).show();
+                            // Render markdown to HTML using marked.js
+                            const html = marked.parse(response.stdout || '');
+                            $('#result-container').html(html).show();
                         } else {
                             $('#result-container').html('<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ' + response.message + '</div>').show();
                         }
@@ -246,6 +248,23 @@
                         let errorMessage = 'An error occurred while processing your request.';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            try {
+                                const parsed = JSON.parse(xhr.responseText);
+                                if (parsed && parsed.message) {
+                                    errorMessage = parsed.message;
+                                } else if (parsed && parsed.error) {
+                                    errorMessage = parsed.error;
+                                } else {
+                                    errorMessage = xhr.responseText;
+                                }
+                            } catch (e) {
+                                errorMessage = xhr.responseText || xhr.statusText || errorMessage;
+                            }
+                        } else if (xhr.statusText) {
+                            errorMessage = xhr.statusText;
+                        } else if (xhr.status) {
+                            errorMessage = 'HTTP error ' + xhr.status;
                         }
                         $('#result-container').html('<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ' + errorMessage + '</div>').show();
                     },
