@@ -14,6 +14,13 @@
     --text-secondary: rgba(255, 255, 255, 0.6);
     --border-color: #444;
     --shadow-color: rgba(0, 0, 0, 0.5);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-blur: 12px;
+    --glass-border: rgba(255,255,255,0.3);
+    --modern-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+    --modern-radius: 18px;
+    --modern-accent: #4361ee;
+    --modern-accent-dark: #22223b;
 }
 
 /* Base Styles */
@@ -28,6 +35,11 @@ body {
     background-color: #f8f9fa;
     color: #343a40;
     line-height: 1.6;
+}
+
+body.dark-mode {
+    background: #181a1b;
+    color: #f8f9fa;
 }
 
 .container {
@@ -67,6 +79,18 @@ h1 {
 /* Navbar customization */
 .navbar {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--modern-shadow);
+    border-radius: var(--modern-radius);
+    border: 1px solid var(--glass-border);
+    transition: background 0.3s, color 0.3s;
+}
+
+body.dark-mode .navbar {
+    background: rgba(34, 34, 51, 0.7) !important;
+    color: #f8f9fa;
+    border: 1px solid rgba(67,97,238,0.15);
 }
 
 .navbar-brand {
@@ -86,6 +110,18 @@ main {
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     margin-bottom: 20px;
     overflow: hidden;
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--modern-shadow);
+    border-radius: var(--modern-radius);
+    border: 1px solid var(--glass-border);
+    transition: background 0.3s, color 0.3s;
+}
+
+body.dark-mode .card {
+    background: rgba(34, 34, 51, 0.7) !important;
+    color: #f8f9fa;
+    border: 1px solid rgba(67,97,238,0.15);
 }
 
 .card-header {
@@ -181,13 +217,19 @@ textarea {
     background-color: #4361ee;
     border-color: #4361ee;
     transition: all 0.3s ease;
+    background: linear-gradient(90deg, var(--modern-accent) 60%, #4cc9f0 100%);
+    border: none;
+    box-shadow: 0 2px 8px rgba(67,97,238,0.12);
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: background 0.2s, box-shadow 0.2s;
 }
 
 .btn-primary:hover, .btn-primary:focus {
-    background-color: #3a56d4;
-    border-color: #3a56d4;
+    background: linear-gradient(90deg, #4cc9f0 0%, var(--modern-accent) 100%);
+    box-shadow: 0 4px 16px rgba(67,97,238,0.18);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .btn-logout {
@@ -332,6 +374,70 @@ textarea {
     border-radius: 10px;
     background-color: #f8f9fa;
     border: 1px solid #e9ecef;
+    animation: fadeIn 0.7s;
+    position: relative;
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--modern-shadow);
+    border-radius: var(--modern-radius);
+    border: 1px solid var(--glass-border);
+    transition: background 0.3s, color 0.3s;
+}
+
+body.dark-mode #result-container {
+    background: rgba(34, 34, 51, 0.7) !important;
+    color: #f8f9fa;
+    border: 1px solid rgba(67,97,238,0.15);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Copy button styling */
+.copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    z-index: 10;
+    background: var(--modern-accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: background 0.2s, opacity 0.2s;
+}
+.copy-btn:hover {
+    background: #22223b;
+    opacity: 1;
+}
+
+/* Dark mode toggle */
+#darkModeToggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    background: var(--modern-accent);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 2px 8px rgba(67,97,238,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#darkModeToggle:hover {
+    background: #22223b;
 }
 
 /* Tabs */
